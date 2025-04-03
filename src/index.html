@@ -13,7 +13,9 @@
 </head>
 <body>
     <div class="calculator">
-        <input type="text" id="display" class="display" disabled>
+        <form onsubmit="return false;"> <!-- Prevents form submission from reloading the page -->
+            <input type="text" id="display" class="display" disabled>
+        </form>
         <div class="buttons">
             <button onclick="clearDisplay()">C</button>
             <button onclick="appendValue('(')">(</button>
@@ -58,12 +60,24 @@
 
         function calculate() {
             try {
-                let result = eval(document.getElementById("display").value);
+                let expression = document.getElementById("display").value.trim();
+                if (!expression) return; // Prevents execution on empty input
+                
+                let result = Function(`'use strict'; return (${expression})`)();
                 document.getElementById("display").value = result;
             } catch (error) {
                 alert("Invalid Expression");
+                clearDisplay();
             }
         }
+
+        // Prevents Enter key from refreshing the page
+        document.getElementById("display").addEventListener("keypress", function(event) {
+            if (event.key === "Enter") {
+                event.preventDefault();
+                calculate();
+            }
+        });
     </script>
 </body>
 </html>
